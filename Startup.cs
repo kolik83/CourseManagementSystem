@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CourseManagementSystem.Models;
-using CourseManagementSystem.Tests;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -72,7 +71,6 @@ namespace CourseManagementSystem
                 });
                 endpoints.MapControllers();
             });
-            SeedData.SeedDatabase(dContext);
 
         }
     }
