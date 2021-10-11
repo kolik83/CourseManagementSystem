@@ -82,15 +82,13 @@ namespace CourseManagementSystem.Controllers
 
         [HttpPost]
         [Authorize(Roles = "professor")]
-        public async Task<ActionResult<StudentDto>> NewStudent(UserDto user)
+        public async Task<ActionResult<StudentDto>> NewStudent(UserDto userDto)
         {
-            
-            _studentRepository.Create(new Student { Name = user.Name});
-            IdentityUser identityUser = await _studentRepository.CreateUserIdentity(user.Name, user.Password, true);
-            if (identityUser != null)
+
+            Student newStudent = await _studentRepository.NewStudent(userDto);
+            if (newStudent != null)
             {
-                await _studentRepository.SaveAsync();
-                return new StudentDto { Name = user.Name };
+                return new StudentDto { Name = newStudent.Name };
             }
             return NotFound();
         }

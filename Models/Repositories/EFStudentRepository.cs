@@ -30,7 +30,27 @@ namespace CourseManagementSystem.Models.Repositories
                 return null;
             }
         }
-        
+
+        public async Task<Student> NewStudent(UserDto userDto)
+        {
+            var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                Student newStudent = new Student { Name = userDto.Name };
+                Create(newStudent);
+                IdentityUser identityUser = await CreateUserIdentity(userDto.Name, userDto.Password, true);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return newStudent;
+            }
+            catch (Exception)
+            {
+
+                await transaction .RollbackAsync();
+                return null;
+            }
+        }
+
         public async Task<StudentDto> DeleteStudent(StudentDto studentDto)
         {
             try
@@ -48,9 +68,19 @@ namespace CourseManagementSystem.Models.Repositories
                     return null;
                 else
                 {
-                    await _userManager.DeleteAsync(identityUser);
-                    await _context.SaveChangesAsync();
-                    return studentDto;
+                    using var transaction =await _context.Database.BeginTransactionAsync();
+                    try
+                    {
+                        await _userManager.DeleteAsync(identityUser);
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                        return studentDto;
+                    }
+                    catch (Exception)
+                    {
+                        await transaction.CommitAsync();
+                        return null;
+                    }
                 }
             }
             catch (Exception)
